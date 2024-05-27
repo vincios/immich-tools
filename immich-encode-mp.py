@@ -4,7 +4,6 @@ import click
 from urllib.parse import urlparse, urlunparse
 from pprint import pprint
 import logging
-import json
 
 # TODO: improve logging
 logger = logging.getLogger(__name__)
@@ -131,7 +130,7 @@ def mp_encode(asset_id: str, server_url: str, api_key: str, log_level: str):
                 server.transcode_assets(mp_assets_live_video_ids)
                 click.secho(f"{len(mp_assets)} jobs queued!", bold=True)
             except:
-                click.secho("An error occourred!", fg="red", bold=True)
+                click.secho("An error occurred!", fg="red", bold=True)
     else:
         asset = server.get_asset_info(asset_id)
         logger.debug("Asset data: %s" % asset)
@@ -147,7 +146,7 @@ def mp_encode(asset_id: str, server_url: str, api_key: str, log_level: str):
                 #server.transcode_assets([live_video_id])
                 click.secho(f"Encoding jobs queued!", bold=True)
             except:
-                click.secho("An error occourred!", fg="red", bold=True)
+                click.secho("An error occurred!", fg="red", bold=True)
 
 if __name__ == "__main__":
     mp_encode()
