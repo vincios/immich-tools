@@ -1,5 +1,6 @@
 from typing import Any
 import click
+from datetime import date, datetime
 import logging
 
 from immich.client import ImmichClient
@@ -24,9 +25,11 @@ def setLogging(loglevel: str = "INFO"):
 @click.command()
 @click.option('-server', "server_url", help="URL of the Immich server")
 @click.option('-key', 'api_key', help="Your API key")
+@click.option('-date-start', help="Filter only assets created after this date (format YYYY-MM-DD)",
+              type=click.DateTime(formats=["%Y-%m-%d"]), default=None)
 @click.option('-log', 'log_level', help="Log level [DEBUG, INFO, WARNING, ERROR, CRITICAL]", default="INFO", show_default=True)
 @click.argument('ASSET_ID')
-def mp_encode(asset_id: str, server_url: str, api_key: str, log_level: str):
+def mp_encode(asset_id: str, server_url: str, api_key: str, date_start: datetime, log_level: str):
     """
     Encode the extracted live video of a motion photo asset, given its ASSET_ID. 
     
@@ -39,9 +42,9 @@ def mp_encode(asset_id: str, server_url: str, api_key: str, log_level: str):
 
     if asset_id.lower() == "all":
         click.echo("Searching for MP assets...")
-        mp_assets = client.get_mp_assets()
+        mp_assets = client.get_mp_assets(date_start)
 
-        if (len(mp_assets) == 0):
+        if not mp_assets or len(mp_assets) == 0:
             click.secho("Found 0 MP assets", bold=True)
         else:
             click.confirm(f"Found {len(mp_assets)} MP assets. Start encoding?", abort=True)

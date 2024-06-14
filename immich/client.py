@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 import requests
 from immich.utils import parse_server_url
@@ -34,20 +35,42 @@ class ImmichClient:
         return self._response_json_or_none(response)
 
 
-    def get_mp_assets(self) -> list[Any] | None:
+    def get_mp_assets(self, start_date: datetime) -> list[Any] | None:
         """
         Return all assets that are motion photos
         """
-        endpoint = "/assets"
+        endpoint = "/search/metadata"
         url = f"{self._server_url}{endpoint}"
         
-        response = requests.request("GET", url, headers=self._default_headers)
+        motion_photos = []
 
-        if response.status_code != 200:
-            return None
+        # emulate a do...while
+        page = 1
+        while True:
+            body = {
+                "isMotion": True,
+                "page": page
+            }
+            if start_date:
+                body['takenAfter'] = start_date.isoformat(timespec="milliseconds")
+
+            response = requests.request("POST", url, headers=self._default_headers, json=body)
+            if response.status_code != 200:
+                break
             
-        assets = response.json()
-        return [asset for asset in assets if asset['livePhotoVideoId'] is not None]
+            data = response.json()
+            assets = data['assets']['items']
+
+            # should be aleady all motion photos, but let's be sure
+            mp = [asset for asset in assets if asset['livePhotoVideoId'] is not None]
+            motion_photos.extend(mp)
+
+            if not data['assets']['nextPage']:
+                break
+            
+            page = data['assets']['nextPage']
+    
+        return motion_photos if len(motion_photos) else None
 
 
     def transcode_assets(self, asset_ids: list[str]) -> None:
