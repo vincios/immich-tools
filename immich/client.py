@@ -25,7 +25,7 @@ class ImmichClient:
         return None
 
     def get_asset_info(self, asset_id: str) -> Any | None:
-        endpoint = f"/asset/{asset_id}"
+        endpoint = f"/assets/{asset_id}"
 
         url = f"{self._server_url}{endpoint}"
         
@@ -38,7 +38,7 @@ class ImmichClient:
         """
         Return all assets that are motion photos
         """
-        endpoint = "/asset"
+        endpoint = "/assets"
         url = f"{self._server_url}{endpoint}"
         
         response = requests.request("GET", url, headers=self._default_headers)
@@ -51,7 +51,7 @@ class ImmichClient:
 
 
     def transcode_assets(self, asset_ids: list[str]) -> None:
-        endpoint = "/asset/jobs"
+        endpoint = "/assets/jobs"
         url = f"{self._server_url}{endpoint}"
 
         payload = {
