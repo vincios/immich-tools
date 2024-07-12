@@ -68,7 +68,7 @@ def mp_encode(asset_id: str, server_url: str, api_key: str, date_start: datetime
             click.echo(f"Found live video with id {live_video_id}. Queuing encoding job...")
 
             try:
-                #server.transcode_assets([live_video_id])
+                client.transcode_assets([live_video_id])
                 click.secho(f"Encoding jobs queued!", bold=True)
             except:
                 click.secho("An error occurred!", fg="red", bold=True)
